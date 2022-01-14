@@ -29,19 +29,21 @@ function onSearch(e) {
     fetchCountries(inputElValue)
         .then((countries) => { renderName(countries) })
         .then(response => {
-    if (!response.ok) {
+            if (!response.ok) {
+        
       throw new Error(response.status);
-    }
+            }           
+             if (response.status === "404") {          
+        return
+    }              
     return response.json();
   })
-        .catch((error) => { onFetchError(error) });  
+     .catch((error) => { onFetchError(error) });  
 
 };
 
 function onFetchError(countries) {
-
-Notiflix.Notify.failure (`Oops, there is no country with that name`)
-
+  Notiflix.Notify.failure(`Oops, there is no country with that name`)   
 };
 
 
@@ -51,7 +53,6 @@ function renderName(countries) {
     if (countries.length > 10) {
         Notiflix.Notify.info('Too many matches found. Please enter a more specific name.');
     }
-
     else if (countries.length > 2 && countries.length < 10) {
         const markup = countries
             .map((country) => {
