@@ -14,26 +14,49 @@ const DEBOUNCE_DELAY = 300;
 inputEl.addEventListener('input', debounce(onSearch, DEBOUNCE_DELAY));
 
 function onSearch(e) {
- 
-    fetchCountries(inputEl.value).then((countries) => {
-        console.log(countries);
-        renderName(countries)
-    }).catch()  
+    let inputElValue = inputEl.value;
 
-}
+    if (inputElValue === '') {
+        countryList.innerHTML = " "; 
+        countryInfo.innerHTML = " ";
+    }
+
+    if (inputElValue.trim() === '') return;
+
+
+    
+
+    fetchCountries(inputElValue)
+        .then((countries) => { renderName(countries) })
+        .then(response => {
+    if (!response.ok) {
+      throw new Error(response.status);
+    }
+    return response.json();
+  })
+        .catch((error) => { onFetchError(error) });  
+
+};
+
+function onFetchError(countries) {
+
+Notiflix.Notify.failure (`Oops, there is no country with that name`)
+
+};
+
 
 
 function renderName(countries) {
-    
+   
     if (countries.length > 10) {
-        Notiflix.Notify.warning('Too many matches found. Please enter a more specific name.');
+        Notiflix.Notify.info('Too many matches found. Please enter a more specific name.');
     }
 
     else if (countries.length > 2 && countries.length < 10) {
         const markup = countries
             .map((country) => {
                 return `<li>
-         <img src="${country.flags.svg}" width="30"> ${country.name.common}</li>`;
+         <img src="${country.flags.svg}" width="30"> <span>${country.name.common}</span></li>`;
             })
             .join("");
         countryList.innerHTML = markup;
@@ -48,9 +71,8 @@ function renderName(countries) {
         <p><b>Population</b>: ${country.population}</p>
         <p><b>Languages </b>: ${Object.values(country.languages)}</p>`
             }).join("");
+         countryList.innerHTML = '';
         countryInfo.innerHTML = markup;
-
-    
 
     }
     
@@ -59,18 +81,3 @@ function renderName(countries) {
         
         
         
-//       const markup = users
-//     .map((user) => {
-//       return `<li>
-//           <p><b>Name</b>: ${name.name.official }</p>
-//           <p><b>Capital</b>: ${name.capital}</p>
-//           <p><b>Population</b>: ${name.population}</p>
-//           <p><b>Flags</b>: ${name.flags.svg}</p>
-//           <p><b>Languages </b>: ${name.languages}</p>
-//         </li>`;
-//     })
-//     .join("");
-//   userList.innerHTML = markup; 
-//   }  
-
-
